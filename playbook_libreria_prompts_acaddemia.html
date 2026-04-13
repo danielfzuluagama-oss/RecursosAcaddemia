@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<!--
+/**
+ * @license Copyleft
+ * @copyright MetodologIA para Acaddemia
+ * @author Javier Montaño & Antigravity
+ * @technology GoogleAI Studio | Gemini 1.5 Pro
+ * @poweredBy Antigravity Agent
+ */
+-->
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acaddemia Playbook | Librería de Prompts de Alta Calidad</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0B2545',
+                            gold: '#FBAF33',
+                            goldLight: '#FFC875',
+                            goldDark: '#D4860B',
+                            cyan: '#06B6D4',
+                            cyanLight: '#22D3EE',
+                            dark: '#000000',
+                            raised: '#0A0A0A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --accent-gold: #FBAF33;
+            --accent-cyan: #06B6D4;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        /* Slide System */
+        .deck-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            background: radial-gradient(circle at center, #0B2545 0%, #000000 100%);
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .deck-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 6rem 2rem 8rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0.3;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Glassmorphism Acaddemia Style */
+        .card-glass {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .card-glass:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-4px);
+        }
+
+        .highlight-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #FCD34D);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        /* Navigation */
+        #slide-navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 175, 51, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            color: white;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+        }
+
+        .slide-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-dot.active {
+            background: var(--accent-gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-float {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .prompt-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1.5rem;
+            font-family: 'monospace';
+            font-size: 0.9rem;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(251, 175, 51, 0.1);
+            color: var(--accent-gold);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: 1px solid rgba(251, 175, 51, 0.2);
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-gold);
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fixed Header -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center border border-white/10">
+                <i data-lucide="brain-circuit" class="text-brand-gold w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-heading font-extrabold text-white text-lg tracking-tight">Acaddemia <span
+                        class="text-white/40 font-light">| Playbook</span></h1>
+                <p class="text-[0.65rem] text-brand-gold font-bold uppercase tracking-widest">Guía de Especialización
+                </p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-6">
+            <div
+                class="px-3 py-1 rounded-full bg-brand-gold/10 border border-brand-gold/20 text-brand-gold text-[0.65rem] font-bold uppercase tracking-tighter">
+                Framework R.O.C.E.
+            </div>
+        </div>
+    </header>
+
+    <!-- Deck Container -->
+    <div class="deck-container" id="deck">
+
+        <!-- SLIDE 1: INTRO -->
+        <section class="slide active" id="slide-1">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="inline-block px-4 py-1 rounded-full border border-brand-gold/30 bg-brand-gold/10 text-brand-gold text-xs font-bold uppercase tracking-widest mb-6 animate-float">
+                    Micro-Learning 100% Asíncrono
+                </div>
+                <h2 class="text-5xl md:text-7xl font-heading font-black text-white mb-8 leading-tight">
+                    El Arte de <br><span class="highlight-gold">Dirigir la IA</span>
+                </h2>
+                <p class="text-xl text-white/60 font-light max-w-2xl mx-auto leading-relaxed">
+                    Un prompt no es una pregunta, es una <strong>instrucción de arquitectura</strong>. Aprende a
+                    construir estructuras que garanticen resultados élite.
+                </p>
+                <div class="mt-12 flex justify-center gap-4">
+                    <div class="flex items-center gap-2 text-white/40 text-sm">
+                        <i data-lucide="mouse-pointer-2" class="w-4 h-4"></i> Desliza para empezar
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: FRAMEWORK ROCE -->
+        <section class="slide" id="slide-2">
+            <div class="max-w-5xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-3xl font-heading font-bold text-white mb-6">Framework <span
+                                class="text-brand-gold">R.O.C.E.</span></h3>
+                        <p class="text-white/60 mb-8 italic">La anatomía de un prompt perfecto para Acaddemia.</p>
+
+                        <div class="space-y-4">
+                            <div class="p-4 card-glass border-l-4 border-brand-gold">
+                                <span class="text-brand-gold font-bold text-xl">R</span>ol: <span
+                                    class="text-white/80">¿Quién es la IA? (Ej: "Experto en Supply Chain").</span>
+                            </div>
+                            <div class="p-4 card-glass border-l-4 border-brand-cyan">
+                                <span class="text-brand-cyan font-bold text-xl">O</span>bjetivo: <span
+                                    class="text-white/80">¿Qué debe lograr? (Ej: "Crear un reporte de riesgos").</span>
+                            </div>
+                            <div class="p-4 card-glass border-l-4 border-white/20">
+                                <span class="text-white/40 font-bold text-xl">C</span>ontexto: <span
+                                    class="text-white/80">Límites y datos. (Ej: "Basado en este Excel...").</span>
+                            </div>
+                            <div class="p-4 card-glass border-l-4 border-brand-gold-dark">
+                                <span class="text-brand-gold-dark font-bold text-xl">E</span>structura: <span
+                                    class="text-white/80">¿Cómo se entrega? (Ej: "Tabla Markdown").</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -inset-10 bg-brand-blue/20 blur-3xl rounded-full"></div>
+                        <div class="card-glass p-8 relative z-10 border-brand-gold/20">
+                            <div class="w-16 h-16 bg-brand-gold/10 rounded-2xl flex items-center justify-center mb-6">
+                                <i data-lucide="award" class="text-brand-gold w-8 h-8"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-4">La Diferencia Élite</h4>
+                            <p class="text-sm text-white/50 leading-relaxed mb-6">
+                                Mientras el usuario promedio usa 10-15 palabras, un líder de Acaddemia usa 50-100
+                                palabras por
+                                prompt estructural, reduciendo el error en un 80%.
+                            </p>
+                            <div
+                                class="text-xs text-brand-gold font-mono tracking-tighter bg-brand-gold/5 p-3 rounded-lg">
+                                CALIDAD = (CONTEXTO * ESPECIFICIDAD) / AMBIGÜEDAD
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: PROMPT 1 - ANÁLISIS ESTRATÉGICO -->
+        <section class="slide" id="slide-3">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-10">
+                    <span class="text-brand-gold font-bold text-xs uppercase tracking-widest">Prompt #1</span>
+                    <h3 class="text-4xl font-heading font-black text-white mt-2">Análisis de Mercado & Competencia</h3>
+                </div>
+
+                <div class="card-glass p-1">
+                    <div class="prompt-box rounded-2xl text-white/80">
+                        <div class="copy-btn" onclick="copyPrompt(this)">COPIAR</div>
+                        Actúa como un Consultor Senior de Estrategia Digital. Tu objetivo es realizar un análisis
+                        comparativo de la empresa [NOMBRE_EMPRESA] frente a sus 3 competidores principales en el sector
+                        de [SECTOR].
+
+                        Analiza los siguientes ejes:
+                        1. Propuesta de Valor única percibida.
+                        2. Canales digitales con mayor tracción.
+                        3. Debilidades críticas en su experiencia de cliente.
+
+                        Contexto: [AÑADIR DATOS O URL].
+                        Estructura: Entrega los resultados en una tabla comparativa Markdown, seguida de una lista de 3
+                        "Oportunidades de Océano Azul" para [NOMBRE_EMPRESA].
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 bg-white/5 rounded-2xl border border-white/10">
+                    <div class="flex items-center gap-3 mb-2 text-brand-cyan">
+                        <i data-lucide="info" class="w-5 h-5"></i>
+                        <span class="font-bold text-sm">Consejo Acaddemia:</span>
+                    </div>
+                    <p class="text-xs text-white/50">Utiliza este prompt con <strong>Perplexity</strong> o
+                        <strong>Gemini (con búsqueda habilitada)</strong> para obtener fuentes en tiempo real.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: PROMPT 2 - REDACCIÓN EJECUTIVA -->
+        <section class="slide" id="slide-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-10">
+                    <span class="text-brand-gold font-bold text-xs uppercase tracking-widest">Prompt #2</span>
+                    <h3 class="text-4xl font-heading font-black text-white mt-2">Transmutación de Tono Ejecutivo</h3>
+                </div>
+
+                <div class="card-glass p-1">
+                    <div class="prompt-box rounded-2xl text-white/80">
+                        <div class="copy-btn" onclick="copyPrompt(this)">COPIAR</div>
+                        Eres un experto en comunicación corporativa y relaciones públicas de alto nivel. Toma el
+                        siguiente borrador [TEXTO_BORRADOR] y reescríbelo siguiendo estos lineamientos:
+
+                        1. Tono: Autoritario pero empático, directo y sin "relleno" corporativo.
+                        2. Formato: Estilo "Amazon Writing" (máximo impacto, oraciones cortas, sin adjetivos
+                        innecesarios).
+                        3. Objetivo: Convencer a la junta directiva sobre la necesidad de [PROYECTO].
+
+                        Contexto: La empresa está en [FASE_EMPRESA].
+                        Estructura: Proporciona 3 versiones con sutiles variaciones de urgencia.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: PROMPT 3 - CEREBRO DE OPERACIONES -->
+        <section class="slide" id="slide-5">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-10">
+                    <span class="text-brand-gold font-bold text-xs uppercase tracking-widest">Prompt #3</span>
+                    <h3 class="text-4xl font-heading font-black text-white mt-2">Diagnóstico de Cuellos de Botella</h3>
+                </div>
+
+                <div class="card-glass p-1">
+                    <div class="prompt-box rounded-2xl text-white/80">
+                        <div class="copy-btn" onclick="copyPrompt(this)">COPIAR</div>
+                        Actúa como un Ingeniero de Optimización de Procesos (Black Belt Lean Six Sigma). Tu tarea es
+                        analizar el siguiente flujo de trabajo: [FLUJO_O_DESCRIPCION].
+
+                        Identifica:
+                        - Los 3 puntos de fuga de tiempo más probables.
+                        - Un paso que sea redundante y pueda ser eliminado.
+                        - Qué herramienta de IA específica podría automatizar un paso de este flujo.
+
+                        Contexto: El equipo gasta [X_HORAS] en este proceso.
+                        Estructura: Lista numerada con "Pain Point" -> "Impacto" -> "Solución IA Sugerida".
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: PROMPT 4 - GENERADOR DE CASOS DE USO -->
+        <section class="slide" id="slide-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-10">
+                    <span class="text-brand-gold font-bold text-xs uppercase tracking-widest">Prompt #4</span>
+                    <h3 class="text-4xl font-heading font-black text-white mt-2">Ideación de Casos Piloto</h3>
+                </div>
+
+                <div class="card-glass p-1">
+                    <div class="prompt-box rounded-2xl text-white/80">
+                        <div class="copy-btn" onclick="copyPrompt(this)">COPIAR</div>
+                        Eres un Arquitecto de Innovación con IA. Basado en mi lista de problemas operativos actuales:
+                        [LISTA_PROBLEMAS], genera un Roadmap de 5 Casos de Uso de IA de "Baja Complejidad y Alto
+                        Impacto" (Quick Wins).
+
+                        Para cada caso, detalla:
+                        - Nombre del Piloto.
+                        - Herramienta IA a usar (Ej: Make, Claude, ChatGPT API).
+                        - KPI de éxito sugerido.
+
+                        Contexto: Tenemos un presupuesto de [X] y un equipo de [Y] personas.
+                        Estructura: Formato de Fichas Técnicas cortas.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: PROMPT 5 - AUDITORÍA DE RIESGOS -->
+        <section class="slide" id="slide-7">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-10">
+                    <span class="text-brand-gold font-bold text-xs uppercase tracking-widest">Prompt #5</span>
+                    <h3 class="text-4xl font-heading font-black text-white mt-2">Auditor Externo de Ética y Sesgo</h3>
+                </div>
+
+                <div class="card-glass p-1">
+                    <div class="prompt-box rounded-2xl text-white/80">
+                        <div class="copy-btn" onclick="copyPrompt(this)">COPIAR</div>
+                        Actúa como un Auditor de Riesgos Tecnológicos y Consultor Ético. Analiza la siguiente propuesta
+                        de implementación de IA: [PROPUESTA].
+
+                        Busca y reporta:
+                        1. Potenciales riesgos de privacidad de datos (PII).
+                        2. Sesgos implícitos que la IA podría amplificar en la toma de decisiones.
+                        3. Factores de "Alucinación" críticos a monitorear.
+
+                        Estructura: Clasifica cada riesgo como (Crítico/Moderado/Bajo) y sugiere una táctica de
+                        mitigación inmediata.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: CONCLUSIÓN Y SIGUIENTES PASOS -->
+        <section class="slide" id="slide-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="w-20 h-20 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-brand-gold/30">
+                    <i data-lucide="check-circle" class="text-brand-gold w-10 h-10"></i>
+                </div>
+                <h3 class="text-4xl font-heading font-black text-white mb-6">Librería Dominada</h3>
+                <p class="text-xl text-white/60 mb-12">
+                    Has completado el Playbook #1. Recuerda que la IA es tan buena como el contexto que le das.
+                </p>
+                <div class="p-8 card-glass inline-block border-brand-cyan/30">
+                    <h4 class="text-brand-cyan font-bold mb-4 uppercase tracking-tighter">Tu Siguiente Desafío</h4>
+                    <p class="text-sm text-white/80 max-w-sm">
+                        Ve y practica todos tus conocimientos en <span class="text-white font-bold">Tu herramienta de IA
+                            favorita.</span>
+                    </p>
+                </div>
+                <div class="mt-12">
+                    <p class="text-[0.6rem] text-white/20 uppercase tracking-[0.2em]">&copy; 2025 Acaddemia - Ingeniería
+                        Asistida por Computador</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="slide-navigation">
+        <button class="nav-btn" onclick="navigateSlide(-1)" id="prevBtn">
+            <i data-lucide="chevron-left"></i>
+        </button>
+
+        <div id="slide-progress-dots" class="flex gap-2">
+            <!-- Dots generated by JS -->
+        </div>
+
+        <button class="nav-btn" onclick="navigateSlide(1)" id="nextBtn">
+            <i data-lucide="chevron-right"></i>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const deck = document.getElementById('deck');
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('slide-progress-dots');
+        let currentSlide = 0;
+
+        // Initialize dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `slide-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => scrollToSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.slide-dot');
+
+        function updateActiveState() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+                dots[i].classList.toggle('active', i === currentSlide);
+            });
+
+            // Handle nav buttons visibility
+            document.getElementById('prevBtn').style.opacity = currentSlide === 0 ? '0.2' : '1';
+            document.getElementById('nextBtn').style.opacity = currentSlide === slides.length - 1 ? '0.2' : '1';
+        }
+
+        function scrollToSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            currentSlide = index;
+            deck.scrollTo({
+                left: index * window.innerWidth,
+                behavior: 'smooth'
+            });
+            updateActiveState();
+        }
+
+        function navigateSlide(direction) {
+            scrollToSlide(currentSlide + direction);
+        }
+
+        // Copy Prompt Logic
+        async function copyPrompt(btn) {
+            const promptText = btn.parentElement.innerText.replace('COPIAR', '').trim();
+            try {
+                await navigator.clipboard.writeText(promptText);
+                const originalText = btn.innerText;
+                btn.innerText = '¡COPIADO!';
+                btn.style.background = '#FBAF33';
+                btn.style.color = 'black';
+
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(251, 175, 51, 0.1)';
+                    btn.style.color = '#FBAF33';
+                }, 2000);
+            } catch (err) {
+                console.error('Error copying text: ', err);
+            }
+        }
+
+        // Scroll listener for dot tracking
+        deck.addEventListener('scroll', () => {
+            const index = Math.round(deck.scrollLeft / window.innerWidth);
+            if (index !== currentSlide) {
+                currentSlide = index;
+                updateActiveState();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') navigateSlide(1);
+            if (e.key === 'ArrowLeft') navigateSlide(-1);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            deck.scrollLeft = currentSlide * window.innerWidth;
+        });
+
+    </script>
+</body>
+
+</html>

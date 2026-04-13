@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<!--
+/**
+ * @license Copyleft
+ * @copyright MetodologIA para Acaddemia
+ * @author Javier Montaño & Antigravity
+ * @technology GoogleAI Studio | Gemini 1.5 Pro
+ * @poweredBy Antigravity Agent
+ */
+-->
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acaddemia Playbook | Construcción de Agentes Atómicos</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0B2545',
+                            gold: '#FBAF33',
+                            goldLight: '#FFC875',
+                            goldDark: '#D4860B',
+                            cyan: '#06B6D4',
+                            cyanLight: '#22D3EE',
+                            dark: '#000000',
+                            raised: '#0A0A0A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --accent-gold: #FBAF33;
+            --accent-cyan: #06B6D4;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        /* Slide System */
+        .deck-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            background: radial-gradient(circle at center, #0B2545 0%, #000000 100%);
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .deck-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 6rem 2rem 8rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0.3;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Glassmorphism Acaddemia Style */
+        .card-glass {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .highlight-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #FCD34D);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        /* Navigation */
+        #slide-navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 175, 51, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            color: white;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+        }
+
+        .slide-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-dot.active {
+            background: var(--accent-gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Architecture Elements */
+        .arch-node {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .arch-node:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-gold);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .prompt-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1.5rem;
+            font-family: 'monospace';
+            font-size: 0.85rem;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--accent-gold);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fixed Header -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center border border-white/10">
+                <i data-lucide="bot" class="text-brand-gold w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-heading font-extrabold text-white text-lg tracking-tight">Acaddemia <span
+                        class="text-white/40 font-light">| Playbook</span></h1>
+                <p class="text-[0.65rem] text-brand-gold font-bold uppercase tracking-widest">Guía de Especialización
+                </p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-xs font-bold text-white/40 uppercase tracking-widest">
+            Autonomous Systems
+        </div>
+    </header>
+
+    <!-- Deck Container -->
+    <div class="deck-container" id="deck">
+
+        <!-- SLIDE 1: INTRO -->
+        <section class="slide active" id="slide-1">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="inline-block px-4 py-1 rounded-full border border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan text-xs font-bold uppercase tracking-widest mb-6">
+                    Módulo de Sistemas Autónomos
+                </div>
+                <h2 class="text-5xl md:text-7xl font-heading font-black text-white mb-8 leading-tight">
+                    Nace tu <br><span class="highlight-gold">Primer Empleado Digital</span>
+                </h2>
+                <p class="text-xl text-white/60 font-light max-w-2xl mx-auto leading-relaxed">
+                    Un agente no solo responde, <strong>razona y actúa</strong>. Aprende a construir cerebros
+                    artificiales que operan con propósito y precisión.
+                </p>
+                <div class="mt-12 flex justify-center gap-4">
+                    <div class="p-4 card-glass border-brand-gold/20 flex items-center gap-4">
+                        <i data-lucide="cpu" class="text-brand-gold w-6 h-6"></i>
+                        <div class="text-left">
+                            <span class="block text-white font-bold text-sm">Autonomía Total</span>
+                            <span class="block text-white/40 text-xs">Instrucciones + Herramientas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: ANATOMÍA DEL AGENTE -->
+        <section class="slide" id="slide-2">
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-12 text-center">Anatomía del <span
+                        class="text-brand-gold">Agente Atómico</span></h3>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card-glass p-6 arch-node">
+                        <div class="w-12 h-12 bg-brand-blue/40 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="brain-cog" class="text-brand-cyan w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-3">Model (El Cerebro)</h4>
+                        <p class="text-xs text-white/50 leading-relaxed">
+                            El LLM subyacente (Claude 3.5, GPT-4o, Gemini 1.5). Define la capacidad de razonamiento y el
+                            límite de contexto.
+                        </p>
+                    </div>
+
+                    <div class="card-glass p-6 arch-node">
+                        <div class="w-12 h-12 bg-brand-gold/10 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="scroll-text" class="text-brand-gold w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-3">Persona (Instrucciones)</h4>
+                        <p class="text-xs text-white/50 leading-relaxed">
+                            Define quién es, qué sabe y cuáles son sus límites éticos y técnicos. Es el ADN del
+                            comportamiento del agente.
+                        </p>
+                    </div>
+
+                    <div class="card-glass p-6 arch-node">
+                        <div class="w-12 h-12 bg-brand-cyan/10 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="wrench" class="text-brand-cyan w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-white font-bold mb-3">Tools (Las Manos)</h4>
+                        <p class="text-xs text-white/50 leading-relaxed">
+                            Capabilities externas: buscar en Google, leer archivos, ejecutar código o conectar con APIs
+                            vía iPaaS.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-12 p-6 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <i data-lucide="database" class="text-brand-gold w-6 h-6"></i>
+                        <span class="text-sm font-medium text-white/80">Knowledge Base (La Memoria)</span>
+                    </div>
+                    <p class="text-[0.6rem] text-white/40 uppercase tracking-widest text-right">Documentos RAG, Logs y
+                        Contexto Histórico</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: SYSTEM PROMPTING -->
+        <section class="slide" id="slide-3">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-6">Ingeniería de <span
+                        class="text-brand-gold">Instrucciones Maestro</span></h3>
+                <p class="text-white/50 mb-8 italic text-sm">El "System Prompt" que separa un chatbot de un Agente
+                    Acaddemia.
+                </p>
+
+                <div class="card-glass p-1">
+                    <div class="prompt-box rounded-2xl text-white/80">
+                        <div class="copy-btn" onclick="copyPrompt(this)">COPIAR</div>
+                        ROL: Eres el Agente de Auditoría Interna de Acaddemia.<br>
+                        OBJETIVO: Revisar reportes de gastos buscando anomalías del 100% de cumplimiento fiscal.<br>
+                        HERRAMIENTAS: Tienes acceso a la 'Search_API' y al 'Tax_Calculator'.<br><br>
+                        GUARDRAILS (LÍMITES):<br>
+                        1. NUNCA compartas datos de PII (id_usuario, nombres reales) fuera del log seguro.<br>
+                        2. Si el error es > 15%, marca como "CRITICAL" y escala a humano.<br>
+                        3. Responde siempre en formato JSON estructurado.<br><br>
+                        ESTILO: Directo, técnico, sin adjetivos innecesarios.
+                    </div>
+                </div>
+
+                <div class="mt-8 grid md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-brand-gold/5 border border-brand-gold/20 rounded-xl">
+                        <h5 class="text-brand-gold font-bold text-xs uppercase mb-2">Tip de Oro #1</h5>
+                        <p class="text-[0.7rem] text-white/60">Define los pasos de razonamiento (Chain of Thought). Pide
+                            al agente que "piense antes de responder".</p>
+                    </div>
+                    <div class="p-4 bg-brand-cyan/5 border border-brand-cyan/20 rounded-xl">
+                        <h5 class="text-brand-cyan font-bold text-xs uppercase mb-2">Tip de Oro #2</h5>
+                        <p class="text-[0.7rem] text-white/60">Asigna "Negative Constraints". Decirle qué NO hacer es
+                            tan valioso como decirle qué hacer.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: TESTING Y GUARDRAILS -->
+        <section class="slide" id="slide-4">
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-10 text-center">Protocolo de <span
+                        class="text-brand-cyan">Confiabilidad</span></h3>
+
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 font-bold text-xs">
+                                !</div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Prueba de Estrés (Adversarial)</h4>
+                                <p class="text-xs text-white/40">Intenta confundir al agente con instrucciones
+                                    contradictorias para ver si respeta sus Guardrails.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold font-bold text-xs">
+                                ?</div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Evaluación de Alucinación</h4>
+                                <p class="text-xs text-white/40">Pide datos inexistentes pero plausibles. El agente debe
+                                    saber decir "No tengo acceso a esa información".</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="w-8 h-8 rounded bg-brand-cyan/10 border border-brand-cyan/20 flex items-center justify-center text-brand-cyan font-bold text-xs">
+                                V</div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Golden Dataset Verification</h4>
+                                <p class="text-xs text-white/40">Usa un set de 10 preguntas con respuestas ya validadas
+                                    y mide qué porcentaje acierta el agente.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="card-glass p-8 border-brand-gold/10 overflow-hidden">
+                            <div class="absolute -top-10 -right-10 w-40 h-40 bg-brand-gold/10 blur-3xl rounded-full">
+                            </div>
+                            <h4 class="text-xl font-black text-white mb-6">KPIs del Agente</h4>
+                            <div class="space-y-4">
+                                <div class="bg-black/40 p-4 rounded-xl">
+                                    <div class="flex justify-between text-[0.65rem] mb-1 uppercase font-bold">
+                                        <span class="text-white/60">Tasa de Éxito</span>
+                                        <span class="text-brand-gold">98% Target</span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-brand-gold w-[98%]"></div>
+                                    </div>
+                                </div>
+                                <div class="bg-black/40 p-4 rounded-xl">
+                                    <div class="flex justify-between text-[0.65rem] mb-1 uppercase font-bold">
+                                        <span class="text-white/60">Costo por Tarea</span>
+                                        <span class="text-brand-cyan">Optimización</span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-brand-cyan w-[65%]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: CONCLUSIÓN -->
+        <section class="slide" id="slide-5">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="w-20 h-20 bg-brand-cyan/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-brand-cyan/30">
+                    <i data-lucide="award" class="text-brand-cyan w-10 h-10"></i>
+                </div>
+                <h3 class="text-4xl font-heading font-black text-white mb-6">Misión: Automatizar</h3>
+                <p class="text-xl text-white/60 mb-12">
+                    Has aprendido a diseñar sistemas que no solo responden, sino que resuelven. Eres un arquitecto de
+                    agentes.
+                </p>
+                <div class="p-8 card-glass inline-block border-brand-gold/30">
+                    <h4 class="text-brand-gold font-bold mb-4 uppercase tracking-tighter">Entregable Final</h4>
+                    <p class="text-sm text-white/80 max-w-sm">
+                        Utiliza el <strong>Acaddemia Agent Studio (Flowise)</strong> para desplegar tu primer agente
+                        atomizado
+                        y probarlo con datos reales.
+                    </p>
+                </div>
+                <div class="mt-12">
+                    <p class="text-[0.6rem] text-white/20 uppercase tracking-[0.2em]">&copy; 2025 Acaddemia - Ingeniería
+                        Asistida por Computador</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="slide-navigation">
+        <button class="nav-btn" onclick="navigateSlide(-1)" id="prevBtn">
+            <i data-lucide="chevron-left"></i>
+        </button>
+
+        <div id="slide-progress-dots" class="flex gap-2">
+            <!-- Dots generated by JS -->
+        </div>
+
+        <button class="nav-btn" onclick="navigateSlide(1)" id="nextBtn">
+            <i data-lucide="chevron-right"></i>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const deck = document.getElementById('deck');
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('slide-progress-dots');
+        let currentSlide = 0;
+
+        // Initialize dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `slide-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => scrollToSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.slide-dot');
+
+        function updateActiveState() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+                dots[i].classList.toggle('active', i === currentSlide);
+            });
+
+            // Handle nav buttons visibility
+            document.getElementById('prevBtn').style.opacity = currentSlide === 0 ? '0.2' : '1';
+            document.getElementById('nextBtn').style.opacity = currentSlide === slides.length - 1 ? '0.2' : '1';
+        }
+
+        function scrollToSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            currentSlide = index;
+            deck.scrollTo({
+                left: index * window.innerWidth,
+                behavior: 'smooth'
+            });
+            updateActiveState();
+        }
+
+        function navigateSlide(direction) {
+            scrollToSlide(currentSlide + direction);
+        }
+
+        // Copy Prompt Logic
+        async function copyPrompt(btn) {
+            const promptText = btn.parentElement.innerText.replace('COPIAR', '').trim();
+            try {
+                await navigator.clipboard.writeText(promptText);
+                const originalText = btn.innerText;
+                btn.innerText = '¡COPIADO!';
+                btn.style.background = '#EAB308';
+                btn.style.color = 'black';
+
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(255, 215, 0, 0.1)';
+                    btn.style.color = '#EAB308';
+                }, 2000);
+            } catch (err) {
+                console.error('Error copying text: ', err);
+            }
+        }
+
+        // Scroll listener for dot tracking
+        deck.addEventListener('scroll', () => {
+            const index = Math.round(deck.scrollLeft / window.innerWidth);
+            if (index !== currentSlide) {
+                currentSlide = index;
+                updateActiveState();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') navigateSlide(1);
+            if (e.key === 'ArrowLeft') navigateSlide(-1);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            deck.scrollLeft = currentSlide * window.innerWidth;
+        });
+
+    </script>
+</body>
+
+</html>

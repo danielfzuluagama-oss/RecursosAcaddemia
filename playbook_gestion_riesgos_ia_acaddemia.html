@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<!--
+/**
+ * @license Copyleft
+ * @copyright MetodologIA para Acaddemia
+ * @author Javier Montaño & Antigravity
+ * @technology GoogleAI Studio | Gemini 1.5 Pro
+ * @poweredBy Antigravity Agent
+ */
+-->
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acaddemia Playbook | Gestión de Riesgos y Mitigación</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0B2545',
+                            gold: '#FBAF33',
+                            goldLight: '#FFC875',
+                            goldDark: '#D4860B',
+                            cyan: '#06B6D4',
+                            cyanLight: '#22D3EE',
+                            dark: '#000000',
+                            raised: '#0A0A0A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --accent-gold: #FBAF33;
+            --accent-cyan: #06B6D4;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        /* Slide System */
+        .deck-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            background: radial-gradient(circle at center, #0B2545 0%, #000000 100%);
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .deck-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 6rem 2rem 8rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0.3;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Glassmorphism Acaddemia Style */
+        .card-glass {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .highlight-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #FCD34D);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        /* Navigation */
+        #slide-navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 175, 51, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            color: white;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+        }
+
+        .slide-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-dot.active {
+            background: var(--accent-gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        .risk-table {
+            display: grid;
+            grid-template-columns: 40px repeat(3, 1fr);
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .risk-header-col {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .risk-cell {
+            min-height: 80px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 12px;
+            transition: all 0.3s ease;
+            cursor: help;
+        }
+
+        .risk-cell:hover {
+            transform: scale(1.02);
+            filter: brightness(1.2);
+        }
+
+        .risk-low {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .risk-medium {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            color: #facc15;
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .risk-critical {
+            background: rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: white;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Modal Structure */
+        #definition-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #definition-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid rgba(251, 175, 51, 0.3);
+            border-radius: 2rem;
+            max-width: 500px;
+            width: 100%;
+            padding: 2.5rem;
+            transform: scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        #definition-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        /* Ethics Tools Info Cards */
+        .info-card-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .info-card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .info-card-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(251, 175, 51, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(251, 175, 51, 0.3);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-card-icon {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(251, 175, 51, 0.1);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+            color: var(--brand-gold);
+            border: 1px solid rgba(251, 175, 51, 0.2);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-gold);
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 4rem 1.5rem 6rem 1.5rem;
+            }
+
+            .risk-table {
+                grid-template-columns: 30px repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .risk-cell {
+                font-size: 0.55rem;
+                padding: 6px;
+                min-height: 70px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fixed Header -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center border border-white/10">
+                <i data-lucide="shield-check" class="text-brand-gold w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-heading font-extrabold text-white text-lg tracking-tight">Acaddemia <span
+                        class="text-white/40 font-light">| Playbook</span></h1>
+                <p class="text-[0.65rem] text-brand-gold font-bold uppercase tracking-widest">Tema 5: Riesgos y
+                    Mitigación
+                </p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-xs font-bold text-white/40 uppercase tracking-widest">
+            Responsible IA Framework
+        </div>
+    </header>
+
+    <!-- Deck Container -->
+    <div class="deck-container" id="deck">
+
+        <!-- SLIDE 1: INTRO -->
+        <section class="slide active" id="slide-1">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="inline-block px-4 py-1 rounded-full border border-red-500/30 bg-red-500/10 text-red-400 text-[0.6rem] md:text-xs font-bold uppercase tracking-widest mb-6 transition-all hover:scale-105">
+                    Módulo de Ética y Seguridad
+                </div>
+                <h2 class="text-4xl md:text-7xl font-heading font-black text-white mb-6 leading-tight">
+                    El Cinturón de <br><span class="highlight-gold">Seguridad de la IA</span>
+                </h2>
+                <p class="text-lg md:text-xl text-white/60 font-light max-w-2xl mx-auto leading-relaxed mb-10">
+                    Innovar sin control es un riesgo irresponsable. Aprende a <strong>gobernar la IA</strong> para que
+                    sea tu aliada más segura y ética.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                    <div class="p-4 card-glass border-white/5 flex flex-col items-center gap-3 text-center">
+                        <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                            <i data-lucide="shield-alert" class="text-red-500 w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="block text-white font-bold text-sm">Mitigación</span>
+                            <span class="block text-white/40 text-[0.6rem] uppercase">Reducción de sesgos</span>
+                        </div>
+                    </div>
+                    <div class="p-4 card-glass border-white/5 flex flex-col items-center gap-3 text-center">
+                        <div class="w-10 h-10 rounded-full bg-brand-gold/20 flex items-center justify-center">
+                            <i data-lucide="eye" class="text-brand-gold w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="block text-white font-bold text-sm">Transparencia</span>
+                            <span class="block text-white/40 text-[0.6rem] uppercase">Explicabilidad del modelo</span>
+                        </div>
+                    </div>
+                    <div class="p-4 card-glass border-white/5 flex flex-col items-center gap-3 text-center">
+                        <div class="w-10 h-10 rounded-full bg-brand-cyan/20 flex items-center justify-center">
+                            <i data-lucide="lock" class="text-brand-cyan w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <span class="block text-white font-bold text-sm">Privacidad</span>
+                            <span class="block text-white/40 text-[0.6rem] uppercase">Control de PII</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: MATRIZ DE RIESGOS -->
+        <section class="slide" id="slide-2">
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-8 text-center">Matriz de <span
+                        class="text-brand-gold">Impacto vs Probabilidad</span></h3>
+
+                <div class="card-glass p-4 md:p-8">
+                    <div class="risk-table">
+                        <!-- Impact Label -->
+                        <div class="vertical-text text-xs text-white/40 font-bold uppercase" style="grid-row: span 3;">
+                            Impacto</div>
+
+                        <!-- Row 1 -->
+                        <div class="risk-cell risk-high" onclick="showDefinition('Alucinaciones Críticas')" title="Click para ver definición">Alucinaciones Críticas</div>
+                        <div class="risk-cell risk-critical" onclick="showDefinition('Fuga de Datos Sensibles')" title="Click para ver definición">Fuga de Datos Sensibles</div>
+                        <div class="risk-cell risk-critical" onclick="showDefinition('Decisiones Sesgadas')" title="Click para ver definición">Decisiones Sesgadas</div>
+
+                        <!-- Row 2 -->
+                        <div class="risk-cell risk-low" onclick="showDefinition('Errores de Formato')" title="Click para ver definición">Errores de Formato</div>
+                        <div class="risk-cell risk-medium" onclick="showDefinition('Falla de Integración')" title="Click para ver definición">Falla de Integración</div>
+                        <div class="risk-cell risk-high" onclick="showDefinition('Inconsistencia de Voz')" title="Click para ver definición">Inconsistencia de Voz</div>
+
+                        <!-- Row 3 -->
+                        <div class="risk-cell risk-low" onclick="showDefinition('Lentitud de Respuesta')" title="Click para ver definición">Lentitud de Respuesta</div>
+                        <div class="risk-cell risk-low" onclick="showDefinition('UI Confusa')" title="Click para ver definición">UI Confusa</div>
+                        <div class="risk-cell risk-medium" onclick="showDefinition('Overfitting de Datos')" title="Click para ver definición">Overfitting de Datos</div>
+
+                        <!-- Corner spacer -->
+                        <div></div>
+
+                        <!-- Probability Labels -->
+                        <div class="risk-header-col">Prob. Baja</div>
+                        <div class="risk-header-col">Prob. Media</div>
+                        <div class="risk-header-col">Prob. Alta</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-center gap-4">
+                    <div class="flex items-center gap-2 text-xs text-white/40">
+                        <span class="w-3 h-3 bg-red-500 rounded-full"></span> Mitigación Inmediata
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-white/40">
+                        <span class="w-3 h-3 bg-brand-gold rounded-full"></span> Monitoreo Activo
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: HERRAMIENTAS DE ÉTICA -->
+        <section class="slide" id="slide-3">
+            <div class="max-w-7xl mx-auto px-6 pt-32 pb-12">
+                <header class="text-center mb-16 relative z-10">
+                    <h3 class="text-3xl font-heading font-black text-white mb-4">Herramientas Recomendadas de <span class="text-brand-gold">Ética de IA</span></h3>
+                    <p class="text-white/40 text-sm max-w-2xl mx-auto">Estas plataformas ayudan a las empresas a auditar, explicar y gobernar sus sistemas de IA para cumplir con estándares éticos internacionales.</p>
+                </header>
+
+                <div class="info-card-grid">
+                    <!-- IBM AIF360 -->
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i data-lucide="cpu"></i>
+                        </div>
+                        <h4 class="text-white font-black text-lg mb-2">IBM AIF360</h4>
+                        <p class="text-[0.7rem] text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/5 pb-2">Kit de Justicia y Equidad</p>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Qué hace?</span>
+                                <p class="text-xs text-white/70">Escanea modelos para detectar si discriminan a grupos por métricas de justicia.</p>
+                            </div>
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Cómo lo hace?</span>
+                                <p class="text-xs text-white/70">Aplica filtros matemáticos antes, durante y después del entrenamiento de la IA.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Microsoft Fairlearn -->
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i data-lucide="code"></i>
+                        </div>
+                        <h4 class="text-white font-black text-lg mb-2">Fairlearn</h4>
+                        <p class="text-[0.7rem] text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/5 pb-2">Transparencia y Explicabilidad</p>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Qué hace?</span>
+                                <p class="text-xs text-white/70">Identifica disparidades en el rendimiento entre diferentes grupos demográficos.</p>
+                            </div>
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Cómo lo hace?</span>
+                                <p class="text-xs text-white/70">Usa algoritmos de optimización que ajustan la IA para ser inclusiva sin perder precisión.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google What-If -->
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i data-lucide="search"></i>
+                        </div>
+                        <h4 class="text-white font-black text-lg mb-2">What-If Tool</h4>
+                        <p class="text-[0.7rem] text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/5 pb-2">Auditoría Visual Interactiva</p>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Qué hace?</span>
+                                <p class="text-xs text-white/70">Permite probar escenarios hipotéticos editando datos sin necesidad de programar.</p>
+                            </div>
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Cómo lo hace?</span>
+                                <p class="text-xs text-white/70">Mediante un panel visual donde comparas al instante resultados de diferentes versiones.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Credo AI -->
+                    <div class="info-card">
+                        <div class="info-card-icon">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <h4 class="text-white font-black text-lg mb-2">Credo AI</h4>
+                        <p class="text-[0.7rem] text-white/40 uppercase tracking-widest font-bold mb-3 border-b border-white/5 pb-2">Gobernanza y Cumplimiento</p>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Qué hace?</span>
+                                <p class="text-xs text-white/70">Gestiona riesgos empresariales y asegura el cumplimiento con leyes como la EU AI Act.</p>
+                            </div>
+                            <div>
+                                <span class="text-brand-gold text-[0.6rem] font-black uppercase block">¿Cómo lo hace?</span>
+                                <p class="text-xs text-white/70">Automatiza auditorías y conecta políticas organizacionales con los flujos técnicos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: CHECKLIST ETICA Y SESGO -->
+        <section class="slide" id="slide-4">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-10">Checklist de <span
+                        class="text-brand-cyan">Auditoría Ética</span></h3>
+
+                <div class="grid md:grid-cols-1 gap-2">
+                    <div class="checklist-item">
+                        <div
+                            class="w-6 h-6 rounded bg-brand-cyan/20 border border-brand-cyan/40 flex items-center justify-center shrink-0">
+                            <i data-lucide="check" class="text-brand-cyan w-4 h-4"></i>
+                        </div>
+                        <div class="text-sm font-medium text-white/80">¿He verificado que el dataset no contiene PII
+                            (Personal Identifiable Information)?</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div
+                            class="w-6 h-6 rounded bg-brand-cyan/20 border border-brand-cyan/40 flex items-center justify-center shrink-0">
+                            <i data-lucide="check" class="text-brand-cyan w-4 h-4"></i>
+                        </div>
+                        <div class="text-sm font-medium text-white/80">¿El modelo ha sido probado con grupos
+                            demográficos diversos para evitar sesgos?</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div
+                            class="w-6 h-6 rounded bg-brand-cyan/20 border border-brand-cyan/40 flex items-center justify-center shrink-0">
+                            <i data-lucide="check" class="text-brand-cyan w-4 h-4"></i>
+                        </div>
+                        <div class="text-sm font-medium text-white/80">¿Existe un mecanismo de "Human-in-the-loop" para
+                            decisiones de alto impacto?</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div
+                            class="w-6 h-6 rounded bg-brand-cyan/20 border border-brand-cyan/40 flex items-center justify-center shrink-0">
+                            <i data-lucide="check" class="text-brand-cyan w-4 h-4"></i>
+                        </div>
+                        <div class="text-sm font-medium text-white/80">¿El agente declara explícitamente que es una IA
+                            al inicio de la interacción?</div>
+                    </div>
+                </div>
+
+                <div class="mt-10 p-6 card-glass border-red-500/10">
+                    <h4 class="text-red-400 font-bold text-xs uppercase mb-2 flex items-center gap-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i> Peligro Crítico: Shadow IA
+                    </h4>
+                    <p class="text-[0.7rem] text-white/40 leading-relaxed">
+                        Cualquier herramienta de IA usada fuera del gobierno de IT (Shadow IA) representa el riesgo más
+                        alto de fuga de propiedad intelectual.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: GOBERNANZA LIGERA -->
+        <section class="slide" id="slide-5">
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-10 text-center">Marco de <span
+                        class="text-brand-gold">Gobernanza Ágil</span></h3>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card-glass p-8 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-5">
+                            <i data-lucide="file-text" class="w-32 h-32 text-white"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-4">DPIA Simplificado</h4>
+                        <p class="text-xs text-white/50 mb-6 italic">Data Protection Impact Assessment</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <span class="text-brand-gold font-black text-xs mt-1">1.</span>
+                                <div>
+                                    <span class="block text-white font-bold text-sm">Origen</span>
+                                    <span class="text-[0.7rem] text-white/40">¿De dónde vienen los datos? ¿Tienen
+                                        permiso?</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-brand-gold font-black text-xs mt-1">2.</span>
+                                <div>
+                                    <span class="block text-white font-bold text-sm">Tratamiento</span>
+                                    <span class="text-[0.7rem] text-white/40">¿Qué hará la IA? ¿Almacena el prompt para
+                                        re-entreno?</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-brand-gold font-black text-xs mt-1">3.</span>
+                                <div>
+                                    <span class="block text-white font-bold text-sm">Destino</span>
+                                    <span class="text-[0.7rem] text-white/40">¿Dónde termina el output? ¿Quién lo
+                                        ve?</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card-glass p-8 bg-gradient-to-br from-brand-gold/5 to-transparent">
+                        <h4 class="text-lg font-bold text-white mb-4">Política Interna Acaddemia</h4>
+                        <div class="space-y-4 text-xs text-white/60">
+                            <div class="p-3 border-l-2 border-brand-gold bg-white/3">
+                                <strong>Transparencia:</strong> Todo contenido generado por IA debe ser etiquetado como
+                                tal.
+                            </div>
+                            <div class="p-3 border-l-2 border-brand-cyan bg-white/3">
+                                <strong>No-Retención:</strong> Los datos de clientes nunca deben enviarse a modelos
+                                abiertos sin modo API/Privado.
+                            </div>
+                            <div class="p-3 border-l-2 border-white/20 bg-white/3">
+                                <strong>Responsabilidad:</strong> El humano que publica es el único responsable del
+                                resultado final.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: CONCLUSIÓN -->
+        <section class="slide" id="slide-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="w-20 h-20 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-brand-gold/30">
+                    <i data-lucide="award" class="text-brand-gold w-10 h-10"></i>
+                </div>
+                <h3 class="text-4xl font-heading font-black text-white mb-6">Líder Responsable</h3>
+                <p class="text-xl text-white/60 mb-12">
+                    Has completado el ciclo estratégico. La IA es poderosa, pero tu criterio de riesgo es lo que la hace
+                    viable para el negocio.
+                </p>
+                <div class="p-8 card-glass inline-block border-brand-cyan/30">
+                    <h4 class="text-brand-cyan font-bold mb-4 uppercase tracking-tighter">Certificación Final</h4>
+                    <p class="text-sm text-white/80 max-w-sm">
+                        Resuelve el caso de estudio "Crisis por Alucinación" y aplica tu matriz de mitigación para
+                        obtener tu insignia de <strong>Líder de IA Estratégica.</strong>
+                    </p>
+                </div>
+                <div class="mt-12">
+                    <p class="text-[0.6rem] text-white/20 uppercase tracking-[0.2em]">&copy; 2025 Acaddemia - Ingeniería
+                        Asistida por Computador</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Definition Modal -->
+    <div id="definition-modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="w-16 h-16 bg-brand-gold/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="info" class="text-brand-gold w-8 h-8"></i>
+            </div>
+            <h4 id="modal-title" class="text-2xl font-black text-white mb-4"></h4>
+            <p id="modal-desc" class="text-white/60 leading-relaxed text-lg"></p>
+            <button onclick="closeModal(null)"
+                class="mt-8 px-6 py-2 bg-brand-gold text-brand-blue font-bold rounded-full hover:bg-brand-goldLight transition-colors">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="slide-navigation">
+        <button class="nav-btn" onclick="navigateSlide(-1)" id="prevBtn">
+            <i data-lucide="chevron-left"></i>
+        </button>
+
+        <div id="slide-progress-dots" class="flex gap-2">
+            <!-- Dots generated by JS -->
+        </div>
+
+        <button class="nav-btn" onclick="navigateSlide(1)" id="nextBtn">
+            <i data-lucide="chevron-right"></i>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const deck = document.getElementById('deck');
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('slide-progress-dots');
+        let currentSlide = 0;
+
+        // Initialize dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `slide-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => scrollToSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.slide-dot');
+
+        function updateActiveState() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+                dots[i].classList.toggle('active', i === currentSlide);
+            });
+
+            // Handle nav buttons visibility
+            document.getElementById('prevBtn').style.opacity = currentSlide === 0 ? '0.2' : '1';
+            document.getElementById('nextBtn').style.opacity = currentSlide === slides.length - 1 ? '0.2' : '1';
+        }
+
+        function scrollToSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            currentSlide = index;
+            deck.scrollTo({
+                left: index * window.innerWidth,
+                behavior: 'smooth'
+            });
+            updateActiveState();
+        }
+
+        function navigateSlide(direction) {
+            scrollToSlide(currentSlide + direction);
+        }
+
+        // Scroll listener for dot tracking
+        deck.addEventListener('scroll', () => {
+            const index = Math.round(deck.scrollLeft / window.innerWidth);
+            if (index !== currentSlide) {
+                currentSlide = index;
+                updateActiveState();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') navigateSlide(1);
+            if (e.key === 'ArrowLeft') navigateSlide(-1);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            deck.scrollLeft = currentSlide * window.innerWidth;
+        });
+
+        // Definitions Logic
+        const definitions = {
+            "Alucinaciones Críticas": "Cuando la IA inventa información de forma muy convincente pero totalmente falsa.",
+            "Fuga de Datos Sensibles": "Compartir por error información privada (como nombres, correos o documentos) con personas no autorizadas.",
+            "Decisiones Sesgadas": "Cuando la IA tiene preferencias injustas que pueden discriminar a ciertos grupos de personas.",
+            "Errores de Formato": "Cuando la respuesta es correcta pero se entrega desordenada o difícil de entender visualmente.",
+            "Falla de Integración": "Cuando el cerebro de la IA no logra conectarse bien con el resto de tus sistemas o apps.",
+            "Inconsistencia de Voz": "Cuando la IA cambia su personalidad o tono de forma extraña (ej. pasa de hablar muy serio a muy informal).",
+            "Lentitud de Respuesta": "Demora frustrante en entregar la solución, afectando la agilidad del equipo.",
+            "UI Confusa": "Diseño que hace difícil interactuar con la IA o entender qué botón presionar.",
+            "Overfitting de Datos": "Cuando la IA solo sabe responder sobre lo que ya vio antes, pero se queda en blanco ante situaciones nuevas."
+        };
+
+        const modal = document.getElementById('definition-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+
+        function showDefinition(term) {
+            modalTitle.innerText = term;
+            modalDesc.innerText = definitions[term] || "Definición no encontrada.";
+            modal.classList.add('active');
+        }
+
+        function closeModal(e) {
+            if (!e || e.target === modal || e.type === 'click') {
+                modal.classList.remove('active');
+            }
+        }
+
+    </script>
+</body>
+
+</html>

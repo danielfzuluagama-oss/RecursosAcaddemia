@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<!--
+/**
+ * @license Copyleft
+ * @copyright MetodologIA para Acaddemia
+ * @author Javier Montaño & Antigravity
+ * @technology GoogleAI Studio | Gemini 1.5 Pro
+ * @poweredBy Antigravity Agent
+ */
+-->
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acaddemia Playbook | Automatización Operativa (iPaaS)</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#0B2545',
+                            gold: '#FBAF33',
+                            goldLight: '#FFC875',
+                            goldDark: '#D4860B',
+                            cyan: '#06B6D4',
+                            cyanLight: '#22D3EE',
+                            dark: '#000000',
+                            raised: '#0A0A0A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --accent-gold: #FBAF33;
+            --accent-cyan: #06B6D4;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        /* Slide System */
+        .deck-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            display: flex;
+            background: radial-gradient(circle at center, #0B2545 0%, #000000 100%);
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .deck-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 6rem 2rem 8rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0.3;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Glassmorphism Acaddemia Style */
+        .card-glass {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .highlight-gold {
+            background: linear-gradient(135deg, var(--accent-gold), #FCD34D);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        /* Navigation */
+        #slide-navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(251, 175, 51, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn {
+            color: white;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            opacity: 1;
+            color: var(--accent-gold);
+        }
+
+        .slide-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slide-dot.active {
+            background: var(--accent-gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Tool Matrix */
+        .tool-card {
+            border-top: 3px solid transparent;
+        }
+
+        .tool-card.make {
+            border-color: #791ed9;
+        }
+
+        .tool-card.zapier {
+            border-color: #ff4a00;
+        }
+
+        .tool-card.power {
+            border-color: #0078d4;
+        }
+
+        .step-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            color: black;
+            font-weight: 900;
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fixed Header -->
+    <header
+        class="fixed top-0 left-0 right-0 z-50 px-8 py-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-brand-blue rounded-lg flex items-center justify-center border border-white/10">
+                <i data-lucide="split" class="text-brand-gold w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-heading font-extrabold text-white text-lg tracking-tight">Acaddemia <span
+                        class="text-white/40 font-light">| Playbook</span></h1>
+                <p class="text-[0.65rem] text-brand-gold font-bold uppercase tracking-widest">Tema 3: Automatización
+                    (iPaaS)</p>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-xs font-bold text-white/40 uppercase tracking-widest">
+            Efficiency Architecture
+        </div>
+    </header>
+
+    <!-- Deck Container -->
+    <div class="deck-container" id="deck">
+
+        <!-- SLIDE 1: INTRO -->
+        <section class="slide active" id="slide-1">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="inline-block px-4 py-1 rounded-full border border-brand-gold/30 bg-brand-gold/10 text-brand-gold text-xs font-bold uppercase tracking-widest mb-6">
+                    Módulo de Arquitectura de Procesos
+                </div>
+                <h2 class="text-5xl md:text-7xl font-heading font-black text-white mb-8 leading-tight">
+                    El Sexto <br><span class="highlight-gold">Sentido Digital</span>
+                </h2>
+                <p class="text-xl text-white/60 font-light max-w-2xl mx-auto leading-relaxed">
+                    Automatizar no es solo conectar apps, es <strong>diseñar libertad operativa</strong>. Transforma
+                    tareas manuales en flujos autónomos y escalables.
+                </p>
+                <div class="mt-12 flex justify-center gap-4">
+                    <div class="p-4 card-glass border-brand-cyan/20 flex items-center gap-4">
+                        <i data-lucide="git-merge" class="text-brand-cyan w-6 h-6"></i>
+                        <div class="text-left">
+                            <span class="block text-white font-bold text-sm">Escala 10x</span>
+                            <span class="block text-white/40 text-xs">Múltiples herramientas conectadas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: MATRIZ DE DECISIÓN -->
+        <section class="slide" id="slide-2">
+            <div class="max-w-6xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-10 text-center">Matriz de Decisión de <span
+                        class="text-brand-gold">Herramientas</span></h3>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Make -->
+                    <div class="card-glass p-8 tool-card make flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-6">
+                            <h4 class="text-2xl font-black text-white">Make</h4>
+                            <span
+                                class="px-3 py-1 bg-purple-500/10 text-purple-400 text-[0.6rem] font-bold uppercase rounded-full border border-purple-500/20 shrink-0">Avanzado</span>
+                        </div>
+                        <p class="text-sm text-white/50 mb-6 flex-grow">Ideal para lógica compleja, iteraciones y
+                            manipulación
+                            profunda de datos.</p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Control visual granular</li>
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Costo por operación bajo</li>
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Potencia de APIs nativa</li>
+                        </ul>
+                        <div class="mt-auto pt-4 border-t border-white/5">
+                            <div class="text-[0.65rem] font-bold text-brand-gold uppercase tracking-tighter">Uso
+                                Recomendado:
+                            </div>
+                            <div class="text-xs text-white/80 mt-1">Sincronización de inventarios, CRM complejo.</div>
+                        </div>
+                    </div>
+
+                    <!-- Zapier -->
+                    <div class="card-glass p-8 tool-card zapier flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-6">
+                            <h4 class="text-2xl font-black text-white">Zapier</h4>
+                            <span
+                                class="px-3 py-1 bg-orange-500/10 text-orange-400 text-[0.6rem] font-bold uppercase rounded-full border border-orange-500/20 shrink-0">Velocidad</span>
+                        </div>
+                        <p class="text-sm text-white/50 mb-6 flex-grow">El estándar de oro para conectividad rápida y
+                            simplicidad
+                            extrema.</p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> +6,000 integraciones</li>
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Curva de aprendizaje mínima</li>
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Estabilidad probada</li>
+                        </ul>
+                        <div class="mt-auto pt-4 border-t border-white/5">
+                            <div class="text-[0.65rem] font-bold text-brand-gold uppercase tracking-tighter">Uso
+                                Recomendado:
+                            </div>
+                            <div class="text-xs text-white/80 mt-1">Notificaciones rápidas, leads de Facebook.</div>
+                        </div>
+                    </div>
+
+                    <!-- Power Automate -->
+                    <div class="card-glass p-8 tool-card power flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-6">
+                            <h4 class="text-2xl font-black text-white">Power <br>Automate</h4>
+                            <span
+                                class="px-3 py-1 bg-blue-500/10 text-blue-400 text-[0.6rem] font-bold uppercase rounded-full border border-blue-500/20 shrink-0">Corporativo</span>
+                        </div>
+                        <p class="text-sm text-white/50 mb-6 flex-grow">Nativo para empresas que viven en el ecosistema
+                            Microsoft
+                            365.</p>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Integración con SharePoint/Outlook</li>
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> Seguridad de grado empresarial</li>
+                            <li class="flex items-center gap-2 text-xs"><i data-lucide="check-circle"
+                                    class="w-4 h-4 text-brand-gold"></i> RPA (Desktop) disponible</li>
+                        </ul>
+                        <div class="mt-auto pt-4 border-t border-white/5">
+                            <div class="text-[0.65rem] font-bold text-brand-gold uppercase tracking-tighter">Uso
+                                Recomendado:
+                            </div>
+                            <div class="text-xs text-white/80 mt-1">Aprobaciones internas, flujos de Excel.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: MAPEANDO EL FLUJO -->
+        <section class="slide" id="slide-3">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-10">La Anatomía del <span
+                        class="text-brand-cyan">Trigger & Action</span></h3>
+
+                <div class="relative">
+                    <div
+                        class="absolute left-6 top-8 bottom-8 w-1 bg-gradient-to-b from-brand-gold via-brand-cyan to-white/10 hidden md:block">
+                    </div>
+
+                    <div class="space-y-8 md:space-y-12">
+                        <div class="flex items-start md:gap-12 relative pl-4 md:pl-0">
+                            <div
+                                class="w-12 h-12 rounded-full bg-brand-gold flex items-center justify-center text-black font-black z-10 shrink-0">
+                                1</div>
+                            <div class="card-glass p-6 w-full">
+                                <h4 class="text-brand-gold font-bold mb-2 uppercase text-xs tracking-widest">Trigger (El
+                                    Disparador)</h4>
+                                <p class="text-white/80 text-sm mb-4">Un evento que inicia el flujo. Debe ser
+                                    específico.</p>
+                                <div
+                                    class="bg-black/40 p-5 rounded-xl border border-white/10 text-[0.75rem] leading-relaxed italic text-white/60">
+                                    Ejemplo: "Cuando un nuevo prospecto llena el formulario en el sitio web".
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start md:gap-12 relative pl-4 md:pl-0">
+                            <div
+                                class="w-12 h-12 rounded-full bg-brand-cyan flex items-center justify-center text-black font-black z-10 shrink-0">
+                                2</div>
+                            <div class="card-glass p-6 w-full">
+                                <h4 class="text-brand-cyan font-bold mb-2 uppercase text-xs tracking-widest">Logic &
+                                    Filters (El Cerebro)</h4>
+                                <p class="text-white/80 text-sm mb-4">Decidir si el flujo continúa o cambia de rumbo.
+                                </p>
+                                <div
+                                    class="bg-black/40 p-5 rounded-xl border border-white/10 text-[0.75rem] leading-relaxed italic text-white/60">
+                                    Ejemplo: "SI el país es Colombia, continuar; SI NO, enviar a equipo internacional".
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start md:gap-12 relative pl-4 md:pl-0">
+                            <div
+                                class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-black z-10 shrink-0">
+                                3</div>
+                            <div class="card-glass p-6 w-full">
+                                <h4 class="text-white/40 font-bold mb-2 uppercase text-xs tracking-widest">Action (El
+                                    Resultado)</h4>
+                                <p class="text-white/80 text-sm mb-4">Lo que la IA hace físicamente.</p>
+                                <div
+                                    class="bg-black/40 p-5 rounded-xl border border-white/10 text-[0.75rem] leading-relaxed italic text-white/60">
+                                    Ejemplo: "Crear el contacto en Salesforce y enviar correo de bienvenida".
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: ROBUSTEZ Y ERRORES -->
+        <section class="slide" id="slide-4">
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-3xl font-heading font-bold text-white mb-12 text-center">Diseño de <span
+                        class="text-brand-gold">Alta Disponibilidad</span></h3>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card-glass p-1">
+                        <div class="p-8 h-full rounded-2xl bg-gradient-to-br from-white/5 to-transparent">
+                            <h4 class="text-white font-bold mb-4 flex items-center gap-3">
+                                <i data-lucide="shield-alert" class="text-red-500 w-6 h-6"></i>
+                                Manejo de Errores
+                            </h4>
+                            <p class="text-sm text-white/50 leading-relaxed">
+                                No preguntes "si" va a fallar, sino "cuándo". Configura <strong>Error Handlers</strong>
+                                para que el flujo no se detenga si una API cae.
+                            </p>
+                            <div class="mt-6 p-4 bg-red-500/5 rounded-xl border border-red-500/10">
+                                <span
+                                    class="text-[0.6rem] font-bold text-red-400 uppercase tracking-widest block mb-1">Táctica
+                                    Pro</span>
+                                <p class="text-xs text-red-200/60 font-medium italic">"Retry logic: Reintentar 3 veces
+                                    cada 15 minutos".</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-glass p-1">
+                        <div class="p-8 h-full rounded-2xl bg-gradient-to-br from-white/5 to-transparent">
+                            <h4 class="text-white font-bold mb-4 flex items-center gap-3">
+                                <i data-lucide="layers" class="text-brand-cyan w-6 h-6"></i>
+                                Modularidad
+                            </h4>
+                            <p class="text-sm text-white/50 leading-relaxed">
+                                Evita los "monolitos". Divide flujos gigantes en micro-servicios conectados. Es más
+                                fácil de debuguear y escalar.
+                            </p>
+                            <div class="mt-6 p-4 bg-brand-cyan/5 rounded-xl border border-brand-cyan/10">
+                                <span
+                                    class="text-[0.6rem] font-bold text-brand-cyan uppercase tracking-widest block mb-1">Táctica
+                                    Pro</span>
+                                <p class="text-xs text-brand-cyan-light font-medium italic">"Usa Webhooks para conectar
+                                    diferentes escenarios entre sí".</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 p-6 card-glass border-brand-gold/10 text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <i data-lucide="lightbulb" class="w-12 h-12 text-brand-gold"></i>
+                    </div>
+                    <p class="text-sm text-white/70 italic">
+                        "En Acaddemia, preferimos un flujo simple que funciona al 100%, que uno complejo que falla al
+                        10%."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: CONCLUSIÓN -->
+        <section class="slide" id="slide-5">
+            <div class="max-w-4xl mx-auto text-center">
+                <div
+                    class="w-20 h-20 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-8 border border-brand-gold/30">
+                    <i data-lucide="terminal" class="text-brand-gold w-10 h-10"></i>
+                </div>
+                <h3 class="text-4xl font-heading font-black text-white mb-6">Arquitecto de Flujos</h3>
+                <p class="text-xl text-white/60 mb-12">
+                    Has definido el esqueleto de tu eficiencia. Ahora es momento de materializarlo en la herramienta
+                    elegida.
+                </p>
+                <div class="p-8 card-glass inline-block border-brand-cyan/30">
+                    <h4 class="text-brand-cyan font-bold mb-4 uppercase tracking-tighter">Tu Siguiente Desafío</h4>
+                    <p class="text-sm text-white/80 max-w-sm">
+                        Accede al taller práctico "Make vs Zapier" donde construiremos un flujo de <strong>Calificación
+                            de Leads Inteligente</strong> en tiempo real.
+                    </p>
+                </div>
+                <div class="mt-12">
+                    <p class="text-[0.6rem] text-white/20 uppercase tracking-[0.2em]">&copy; 2025 Acaddemia - Ingeniería
+                        Asistida por Computador</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav id="slide-navigation">
+        <button class="nav-btn" onclick="navigateSlide(-1)" id="prevBtn">
+            <i data-lucide="chevron-left"></i>
+        </button>
+
+        <div id="slide-progress-dots" class="flex gap-2">
+            <!-- Dots generated by JS -->
+        </div>
+
+        <button class="nav-btn" onclick="navigateSlide(1)" id="nextBtn">
+            <i data-lucide="chevron-right"></i>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        const deck = document.getElementById('deck');
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('slide-progress-dots');
+        let currentSlide = 0;
+
+        // Initialize dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `slide-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => scrollToSlide(i);
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.slide-dot');
+
+        function updateActiveState() {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === currentSlide);
+                dots[i].classList.toggle('active', i === currentSlide);
+            });
+
+            // Handle nav buttons visibility
+            document.getElementById('prevBtn').style.opacity = currentSlide === 0 ? '0.2' : '1';
+            document.getElementById('nextBtn').style.opacity = currentSlide === slides.length - 1 ? '0.2' : '1';
+        }
+
+        function scrollToSlide(index) {
+            if (index < 0 || index >= slides.length) return;
+            currentSlide = index;
+            deck.scrollTo({
+                left: index * window.innerWidth,
+                behavior: 'smooth'
+            });
+            updateActiveState();
+        }
+
+        function navigateSlide(direction) {
+            scrollToSlide(currentSlide + direction);
+        }
+
+        // Scroll listener for dot tracking
+        deck.addEventListener('scroll', () => {
+            const index = Math.round(deck.scrollLeft / window.innerWidth);
+            if (index !== currentSlide) {
+                currentSlide = index;
+                updateActiveState();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') navigateSlide(1);
+            if (e.key === 'ArrowLeft') navigateSlide(-1);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            deck.scrollLeft = currentSlide * window.innerWidth;
+        });
+
+    </script>
+</body>
+
+</html>
